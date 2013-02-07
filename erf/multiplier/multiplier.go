@@ -26,7 +26,8 @@ func ts_sec( ts int64) int64 {
     return  ts >> 32 + ( ts >> 31 & 0x0000000000000001 ) 
 }
 
-func  Loop( in_f *os.File, out_f *os.File, off int ) {
+
+func  Loop( in_f *os.File, out_f *os.File, off int, dry_run bool ) {
 
     var (
         global_offset int64
@@ -111,7 +112,9 @@ func  Loop( in_f *os.File, out_f *os.File, off int ) {
 
             binary.LittleEndian.PutUint64(rec[:8], uint64(new_ts) )
 
-            out_f.Write( rec[:rlen] )
+            if !dry_run {
+                out_f.Write( rec[:rlen] )
+            }
 
             if first_pass {
                 if last_ts > 0 {
@@ -138,6 +141,7 @@ func  Loop( in_f *os.File, out_f *os.File, off int ) {
                     time.Unix( ts_sec(first_ts+global_offset), 0).UTC(), time.Unix( ts_sec(last_ts+global_offset), 0).UTC(),
                         ts_sec(first_ts+global_offset), ts_sec(last_ts+global_offset) )
             }
+            if dry_run { break MAIN_LOOP }
 
         }
         offset += average_gap+range_len

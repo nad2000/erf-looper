@@ -13,6 +13,8 @@ import (
 var (
     // offset in sec
     offset int
+    // dry run - don't write into output and completing after the first pass
+    dry_run bool
 )
 
 func usage() {
@@ -20,19 +22,25 @@ func usage() {
     flag.PrintDefaults()
 
     fmt.Fprintf(os.Stderr, `
-Example:
+Examples:
 
   %s -off -30000000 < ~/small.erf  | nc 192.168.132.109 9999
 
   It will shift timestamps back into the past, loop through all ERF
   records in the file 'small.erf' and "netcats" them to the host port 9999
-`, os.Args[0])    
+
+  %s -dry -off -30000000 < ~/small.erf
+
+  Dry run without writing to the output, and completing after the first pass
+
+`, os.Args[0], os.Args[0])    
 }
 
 func init() {
     flag.Usage = usage
 
-    flag.IntVar( &offset, "off", 0, "Initial offset in sec")
+    flag.IntVar(  &offset,  "off",     0, "Initial offset in sec")
+    flag.BoolVar( &dry_run, "dry", false, "Dry run without writing to the output, and completing after the first pass")
     flag.Parse()
 }
 
@@ -44,6 +52,6 @@ func assert(t bool, s string) {
 
 func  main() {
 
-    multiplier.Loop( os.Stdin, os.Stdout, offset)
+    multiplier.Loop( os.Stdin, os.Stdout, offset, dry_run)
 
 }
