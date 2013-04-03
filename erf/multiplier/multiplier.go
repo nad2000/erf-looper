@@ -23,16 +23,16 @@ func assert(t bool, s string) {
 }
 
 func ts_sec( ts int64) int64 {
-    return  ts >> 32 + ( ts >> 31 & 0x0000000000000001 ) 
+    return  ts >> 32 + ( ts >> 31 & 0x0000000000000001 )
 }
 
 
-func  Loop( in_f *os.File, out_f *os.File, off int, dry_run bool ) {
+func  Loop( in_f *os.File, out_f *os.File, off int, dry_run bool, limit int ) {
 
     var (
         global_offset int64
         average_gap, gap_sum, offset int64
-        ts, prev_ts, first_ts, last_ts, range_len int64
+        ts, prev_ts, first_ts, last_ts, range_len, limit_ts int64
         wlen_sum uint32
         rcount int = 0
         // ERF record
@@ -60,7 +60,7 @@ func  Loop( in_f *os.File, out_f *os.File, off int, dry_run bool ) {
                         // Process cancelled:
                         case syscall.SIGTERM, syscall.SIGQUIT:
                             break MAIN_LOOP
-                    }                
+                    }
                 default:
                     // Do nothing
             }
@@ -83,6 +83,9 @@ func  Loop( in_f *os.File, out_f *os.File, off int, dry_run bool ) {
                 wlen_sum += uint32(wlen)
                 if first_ts == 0 {
                     first_ts = ts
+                    if limit != 0 {
+                        limit_ts = first_ts + int64(limit) << 32
+                    }
                 }
             }
             // fmt.Fprintf(os.Stderr, "Read ts %d length %d\n", uint32(ts >> 32), rlen)
@@ -103,7 +106,7 @@ func  Loop( in_f *os.File, out_f *os.File, off int, dry_run bool ) {
                 rlen = uint16(bcount+16)
             }
 
-            new_ts := ts+offset+global_offset 
+            new_ts := ts+offset+global_offset
             if new_ts < prev_ts {
                 fmt.Fprintf( os.Stderr,
                     "WARNING! Unexpected record with timestamp %d (%d) - goes back in time. It should exceed %d (%d)\n",
@@ -113,6 +116,9 @@ func  Loop( in_f *os.File, out_f *os.File, off int, dry_run bool ) {
             binary.LittleEndian.PutUint64(rec[:8], uint64(new_ts) )
 
             if !dry_run {
+                if limit_ts != 0 && ts+offset > limit_ts {
+                    return
+                }
                 out_f.Write( rec[:rlen] )
             }
 

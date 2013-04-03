@@ -37,7 +37,7 @@ func TestERFLoop(t *testing.T) {
 
     in_r, in_w, _ := os.Pipe()
     out_r, out_w, _ := os.Pipe()
-    go Loop( in_r, out_w, offset)
+    go Loop( in_r, out_w, offset, 0)
 
     // read the first pass output
     rec := make([]byte,100)
@@ -75,5 +75,5 @@ func TestERFLoop(t *testing.T) {
     //             r[8:], rec[8:len (r)] )
     //     }
     // }
-    
+
 }

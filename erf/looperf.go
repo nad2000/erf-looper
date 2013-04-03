@@ -15,6 +15,8 @@ var (
     offset int
     // dry run - don't write into output and completing after the first pass
     dry_run bool
+    // generated traffic limit in seconds
+    limit int
 )
 
 func usage() {
@@ -33,13 +35,14 @@ Examples:
 
   Dry run without writing to the output, and completing after the first pass
 
-`, os.Args[0], os.Args[0])    
+`, os.Args[0], os.Args[0])
 }
 
 func init() {
     flag.Usage = usage
 
     flag.IntVar(  &offset,  "off",     0, "Initial offset in sec")
+    flag.IntVar(  &limit,   "lim",     0, "Limit in sec of generated traffic (default: 0 - no limit)")
     flag.BoolVar( &dry_run, "dry", false, "Dry run without writing to the output, and completing after the first pass")
     flag.Parse()
 }
@@ -52,6 +55,6 @@ func assert(t bool, s string) {
 
 func  main() {
 
-    multiplier.Loop( os.Stdin, os.Stdout, offset, dry_run)
+    multiplier.Loop( os.Stdin, os.Stdout, offset, dry_run, limit)
 
 }
