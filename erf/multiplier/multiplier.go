@@ -13,9 +13,9 @@ import (
 	"time"
 )
 
-var (
-	Scale float
-)
+//var (
+//	Scale float
+//)
 
 func assert(t bool, s string) {
 	if !t {
@@ -27,7 +27,7 @@ func ts_sec(ts int64) int64 {
 	return ts>>32 + (ts >> 31 & 0x0000000000000001)
 }
 
-func Loop(in_f *os.File, out_f *os.File, off int, dry_run bool, limit int) {
+func Loop(in_f *os.File, out_f *os.File, off int, dry_run bool, limit int, count int) {
 
 	var (
 		global_offset                                       int64

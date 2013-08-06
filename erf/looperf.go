@@ -17,6 +17,8 @@ var (
 	dry_run bool
 	// generated traffic limit in seconds
 	limit int
+	// Number of iteration trough the traffic file
+	count int
 )
 
 func usage() {
@@ -51,6 +53,11 @@ func init() {
 		"lim",
 		0,
 		"Limit in sec of generated traffic (default: 0 - no limit)")
+	flag.IntVar(
+		&count,
+		"count",
+		0,
+		"Transmit file <count> times before exiting. (default: 0 - no limit)")
 	flag.BoolVar(
 		&dry_run,
 		"dry",
