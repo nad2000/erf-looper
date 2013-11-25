@@ -24,7 +24,8 @@ func assert(t bool, s string) {
 }
 
 func ts_sec(ts int64) int64 {
-	return ts>>32 + (ts >> 31 & 0x0000000000000001)
+	ts >>= 31
+	return ts>>1 + (ts & 0x0000000000000001)
 }
 
 func Loop(in_f *os.File, out_f *os.File, off int, dry_run bool, limit int, count int) {
@@ -34,7 +35,7 @@ func Loop(in_f *os.File, out_f *os.File, off int, dry_run bool, limit int, count
 		average_gap, gap_sum, offset                        int64
 		ts, prev_ts, first_ts, last_ts, range_len, limit_ts int64
 		wlen_sum                                            uint32
-		rcount                                              int = 0
+		rcount, icount                                      int
 		// ERF record
 		rec [100 * 1024]byte
 	)
@@ -52,6 +53,7 @@ func Loop(in_f *os.File, out_f *os.File, off int, dry_run bool, limit int, count
 MAIN_LOOP:
 	for {
 		in_f.Seek(0, 0)
+		icount++
 		for {
 
 			select {
@@ -157,6 +159,10 @@ MAIN_LOOP:
 		// fmt.Fprintf( os.Stderr, "** offset: %d sec, gap: %d\n", offset >> 32, average_gap)
 
 		first_pass = false
+
+		if (count != 0 && icount >= count) {
+			break MAIN_LOOP
+		}
 
 	}
 

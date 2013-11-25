@@ -74,7 +74,7 @@ func assert(t bool, s string) {
 
 func main() {
 
-	multiplier.Loop(os.Stdin, os.Stdout, offset, dry_run, limit)
+	multiplier.Loop(os.Stdin, os.Stdout, offset, dry_run, limit, count)
 
 }
 
