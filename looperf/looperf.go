@@ -4,7 +4,7 @@
 package main
 
 import (
-	"endace/erf/multiplier"
+	"bitbucket.org/nad2000/erf-looper/erf/multiplier"
 	"flag"
 	"fmt"
 	"os"
